@@ -1,12 +1,13 @@
 import * as THREE from 'three';
-import { GLTFLoader } from '../jsLib/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { scene } from './scene.js';  // Adjust the import to match your project structure
 
 let player;  // This will store our loaded player model
 let playerAnimations = {};  // We will store the animations here
 
 function initPlayer() {
     const loader = new GLTFLoader();
-    loader.load('../models/athleteModels/Man.glb', (gltf) => {
+    loader.load('models/athleteModels/Man.glb', (gltf) => {
         player = gltf.scene;
         scene.add(player);
 
@@ -17,11 +18,12 @@ function initPlayer() {
 
         // For now, we'll just play the idle animation by default
         const mixer = new THREE.AnimationMixer(player);
-        const action = mixer.clipAction(playerAnimations["Idle"]);  // Assuming there's an animation named "Idle"
+        const action = mixer.clipAction(playerAnimations["HumanArmature|Man_Idle"]);  // Assuming there's an animation named "Idle"
         action.play();
 
         // Position the player in the world (adjust as needed)
-        player.position.set(0, 0, 0);
+        player.position.set(62, .4, -118.15);
+        player.scale.set(1,1,1)
     });
 }
 

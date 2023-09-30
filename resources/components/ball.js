@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 import { scene } from './scene.js'; // If you're adding the ball directly to the main scene
 import { footballTextures } from './assets.js';
-import { FBXLoader } from '../jsLib/FBXLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 let ball;  // This will store the loaded ball model
 
 //Load textures onto ball
 function createBall() {
     const loader = new FBXLoader();
-    loader.load('./resources/models/source/football_lp.fbx', (model) => {
+    loader.load('models/source/footballLp.fbx', (model) => {
         model.traverse((child) => {
             if (child.isMesh) {
                 child.material.map = footballTextures.baseColor;
@@ -26,7 +26,7 @@ function createBall() {
         console.log("Three.js Mesh Ball Position:", ball.position);
 
         //Scale
-        ball.scale.set(.012, .012, .012);
+        ball.scale.set(.008, .008, .008);
 
         scene.add(ball);
     });

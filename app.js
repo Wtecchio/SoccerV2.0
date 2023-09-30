@@ -4,7 +4,7 @@ import { createField } from './resources/components/field.js';
 import { createBall } from './resources/components/ball.js';
 import { initPhysics, updatePhysics } from './resources/components/physics.js';
 import { initControls, updateControls } from './resources/components/controls.js';
-//import { initPlayer, updatePlayer } from './resources/components/player.js';
+import { initPlayer, updatePlayer } from './resources/components/player.js';
 //import { initScore, updateScore } from './resources/components/score.js';
 //import { animate } from './resources/components/animations.js';
 
@@ -14,10 +14,12 @@ import { initControls, updateControls } from './resources/components/controls.js
 
 
     // Initialization
+
     initScene();
 
     // Load assets MIGHT NOT NEED FOR NOW
     await loadAssets();
+
 
     // Create field
     createField();
@@ -28,11 +30,13 @@ import { initControls, updateControls } from './resources/components/controls.js
     // Initialize physics
     initPhysics();
 
+    //Initialize player
+    initPlayer();
+
+
     // Initialize controls
     //initControls();
 
-    //Initialize player
-    //initPlayer();
 
     // Initialize scoring system
     //initScore();
@@ -51,13 +55,13 @@ import { initControls, updateControls } from './resources/components/controls.js
 
 
         // Update controls
-       updateControls();
+        updateControls();
 
         // Update physics
         updatePhysics(deltaTime);
 
         // Update player
-        //updatePlayer();
+        updatePlayer();
 
         // Update scoring system
        // updateScore();

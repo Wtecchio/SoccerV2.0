@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\resources",
+    "\\resources\\components",
+    "\\resources\\models"
   ],
-  "SelectedNode": "\\SoccerV2.0.sln",
+  "SelectedNode": "\\resources\\components\\assets.js",
   "PreviewInSolutionExplorer": false
 }

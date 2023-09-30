@@ -5,8 +5,13 @@ const scene = new THREE.Scene();
 
 // Create a camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
+
+
+
 camera.position.set(60, 1.5, -120);  // Set an initial camera position
 camera.lookAt(60, 1.5, -120);  // Make the camera look at the center of the scene
+
+
 
 // Create a renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });

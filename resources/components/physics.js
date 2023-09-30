@@ -1,6 +1,8 @@
 import * as THREE from 'three';
+import * as CANNON from 'cannon'
 import { ball } from './ball.js';
 import { scene } from './scene.js'
+
 
 let world;             // This will hold the physics world
 let ballBody;          // This will hold the ball's physics body
@@ -37,7 +39,7 @@ function initPhysics() {
     ballBody.addShape(ballShape);
     ballBody.position.set(59, 5, -118.15);  // Starting 5 units above the ground, adjust as needed
     world.addBody(ballBody);
-    console.log("BallBody Position:", ballBody.position);
+
 
     // Create a wireframe visualization for the ball's physics body FOR DEBUGGING ONLY
     /*
