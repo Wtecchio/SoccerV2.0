@@ -53,15 +53,18 @@ import { initPlayer, updatePlayer } from './resources/components/player.js';
         const deltaTime = (currentTime - previousTime) / 1000;
         previousTime = currentTime;
 
+        // Update player
+        updatePlayer();
 
         // Update controls
+        //console.log('Debug in _gameLoop: ', player);
+        //console.log("Debug: camera=", camera, "player=", player);
         updateControls();
 
         // Update physics
         updatePhysics(deltaTime);
 
-        // Update player
-        updatePlayer();
+
 
         // Update scoring system
        // updateScore();

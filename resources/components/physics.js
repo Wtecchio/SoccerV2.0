@@ -30,7 +30,7 @@ function initPhysics() {
     let groundBody = new CANNON.Body({ mass: 0 });  // Setting mass to 0 makes it static
     groundBody.addShape(groundShape);
     groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);  // Rotate to align with the ground
-    groundBody.position.y = 0.3;  // Raise the ground by 0.1 units
+    groundBody.position.y = 0.1;  // Raise the ground by 0.1 units
     world.addBody(groundBody);
 
     // Ball Physics:

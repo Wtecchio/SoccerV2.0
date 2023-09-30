@@ -2,11 +2,12 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { scene } from './scene.js';  // Adjust the import to match your project structure
 
-let player;  // This will store our loaded player model
+export let player;  // This will store our loaded player model
 let playerAnimations = {};  // We will store the animations here
 
 function initPlayer() {
     const loader = new GLTFLoader();
+    console.log('Initializing player');  // Debugging line
     loader.load('models/athleteModels/Man.glb', (gltf) => {
         player = gltf.scene;
         scene.add(player);

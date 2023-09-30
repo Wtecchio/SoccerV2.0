@@ -11,14 +11,12 @@ function createField() {
     const loader = new ColladaLoader();
 
 
-    console.log("loader made");
     // Load the .dae model
     loader.load(
         fieldModel,
         (collada) => {
             const model = collada.scene;
 
-            console.log("work?");
 
             // You can scale, rotate, or position the model as needed
             model.scale.set(.1, .1, .1);  // Adjust the scale as necessary
