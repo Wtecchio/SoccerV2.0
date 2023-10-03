@@ -4,6 +4,8 @@ import { footballTextures } from './assets.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 let ball;  // This will store the loaded ball model
+let ballVelocity = new THREE.Vector3(0, 0, 0);  // Initialize with no movement
+
 
 //Load textures onto ball
 function createBall() {
@@ -19,23 +21,18 @@ function createBall() {
         });
 
         ball = model;
-
-
-        //Position
-        ball.position.set(59, 5, -118.15); // Positioning it slightly above the ground
-        console.log("Three.js Mesh Ball Position:", ball.position);
-
-        //Scale
+        ball.position.set(59, 5, -118.15);
         ball.scale.set(.008, .008, .008);
+
+        // Add applyForce method to ball
+        ball.applyForce = function (force) {
+            const ballMass = 1;
+            const acceleration = force.divideScalar(ballMass);
+            ballVelocity.add(acceleration);
+        };
 
         scene.add(ball);
     });
 }
 
-
-
-
-
-
-
-    export { createBall, ball };
+export { createBall, ball, ballVelocity };

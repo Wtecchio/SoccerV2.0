@@ -5,7 +5,7 @@ import { scene } from './scene.js'
 
 
 let world;             // This will hold the physics world
-let ballBody;          // This will hold the ball's physics body
+export let ballBody;          // This will hold the ball's physics body
 let ballWireframe;     // This will hold the wireframe visualization for the ball's physics body
 
 function initPhysics() {

@@ -5,6 +5,8 @@ import { createBall } from './resources/components/ball.js';
 import { initPhysics, updatePhysics } from './resources/components/physics.js';
 import { initControls, updateControls } from './resources/components/controls.js';
 import { initPlayer, updatePlayer } from './resources/components/player.js';
+import { applyMagneticEffect, updateBallPosition } from './resources/components/magnet.js';
+import { updatePlayerState } from './resources/components/playerState.js';  // Adjust path as needed
 //import { initScore, updateScore } from './resources/components/score.js';
 //import { animate } from './resources/components/animations.js';
 
@@ -57,14 +59,19 @@ import { initPlayer, updatePlayer } from './resources/components/player.js';
         updatePlayer();
 
         // Update controls
-        //console.log('Debug in _gameLoop: ', player);
-        //console.log("Debug: camera=", camera, "player=", player);
         updateControls();
 
         // Update physics
         updatePhysics(deltaTime);
 
+        // Apply the magnetic effect between player and ball
+        applyMagneticEffect();
 
+        // Update ball Position
+        updateBallPosition();
+
+        // Update player state based on current conditions
+        updatePlayerState();  
 
         // Update scoring system
        // updateScore();

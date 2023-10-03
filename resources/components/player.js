@@ -22,6 +22,9 @@ function initPlayer() {
         const action = mixer.clipAction(playerAnimations["HumanArmature|Man_Idle"]);  // Assuming there's an animation named "Idle"
         action.play();
 
+        //Adds velocity to the player
+        player.velocity = new THREE.Vector3(0, 0, 0);  // Initialize velocity
+
         // Position the player in the world (adjust as needed)
         player.position.set(62, .4, -118.15);
         player.scale.set(1,1,1)
