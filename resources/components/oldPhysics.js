@@ -38,12 +38,11 @@ function initPhysics() {
             world.addBody(groundBody);
 
             // Ball Physics:
-            let ballShape = new CANNON.Sphere(.75);
+            let ballShape = new CANNON.Sphere(.5);
             ballBody = new CANNON.Body({ mass: 1 });
             ballBody.addShape(ballShape);
             ballBody.position.set(59, 5, -118.15);
-            world.addBody(ballBody);
-
+            world.addBody(ballBody)
 
             //
             //DEBUG VECTORS DELETE ALL LATER
@@ -109,21 +108,26 @@ function initPhysics() {
 
 
 
+
 // Function to update the physics world
 function updatePhysics(deltaTime) {
-    world.step(1 / 60);  // Step the physics world forward in time
+    world.step(1 / 60);
 
-    if (ball && ballBody) {
+    if (ball && ballBody) {  // Safety check
         // Synchronize the graphics object with the physics object:
         ball.position.copy(ballBody.position);
         ball.quaternion.copy(ballBody.quaternion);
 
-        // Synchronize the wireframe with the physics object:
+        // If ball.velocity is not defined, define it
+        if (!ball.velocity) {
+            ball.velocity = new THREE.Vector3();
+        }
+
+        // Synchronize the velocity
+        ball.velocity.copy(ballBody.velocity);
+
         ballWireframe.position.copy(ballBody.position);
         ballWireframe.quaternion.copy(ballBody.quaternion);
-
-        // Update ball's velocity in Three.js to reflect physics velocity
-        ball.velocity.set(ballBody.velocity.x, ballBody.velocity.y, ballBody.velocity.z);
     }
 }
 export { initPhysics, updatePhysics };

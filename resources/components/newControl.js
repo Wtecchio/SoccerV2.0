@@ -1,3 +1,4 @@
+
 import * as THREE from 'three';
 import { camera, renderer } from './scene.js';
 import { OrbitControls } from '../jsLib/OrbitControls.js';  // Adjust the path if needed
@@ -22,7 +23,7 @@ const keyState = {
     r: false,
     Control: false,
     Shift: false,
-    ' ':false
+    ' ': false
 };
 
 // Listen for keydown events
@@ -210,7 +211,8 @@ document.addEventListener('mousemove', function (event) {
 
 
 
-
+//TEMPEORARY CHARACTER SETTINGS PAGE
+onst acceleration = 0.1;  // adjust as per your requirement
 
 function updateControls() {
 
@@ -246,7 +248,6 @@ function updateControls() {
 
         // Update player velocity
         player.velocity = moveDirection.clone().multiplyScalar(speed);
-
 
         // Calculate the camera's position using spherical coordinates
         const x = player.position.x + radius * Math.sin(phi) * Math.cos(theta);

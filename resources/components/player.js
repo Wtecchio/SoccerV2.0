@@ -5,29 +5,38 @@ import { scene } from './scene.js';  // Adjust the import to match your project 
 export let player;  // This will store our loaded player model
 let playerAnimations = {};  // We will store the animations here
 
+
 function initPlayer() {
-    const loader = new GLTFLoader();
-    console.log('Initializing player');  // Debugging line
-    loader.load('models/athleteModels/Man.glb', (gltf) => {
-        player = gltf.scene;
-        scene.add(player);
+    return new Promise((resolve, reject) => {
+        const loader = new GLTFLoader();
+        console.log('Initializing player');
 
-        // Store the animations
-        gltf.animations.forEach((clip) => {
-            playerAnimations[clip.name] = clip;
-        });
+        loader.load('models/athleteModels/Man.glb', (gltf) => {
+            player = gltf.scene;
+            scene.add(player);
 
-        // For now, we'll just play the idle animation by default
-        const mixer = new THREE.AnimationMixer(player);
-        const action = mixer.clipAction(playerAnimations["HumanArmature|Man_Idle"]);  // Assuming there's an animation named "Idle"
-        action.play();
+            // Store the animations
+            gltf.animations.forEach((clip) => {
+                playerAnimations[clip.name] = clip;
+            });
 
-        //Adds velocity to the player
-        player.velocity = new THREE.Vector3(0, 0, 0);  // Initialize velocity
+            // Play the idle animation by default
+            const mixer = new THREE.AnimationMixer(player);
+            const action = mixer.clipAction(playerAnimations["HumanArmature|Man_Idle"]);
+            action.play();
 
-        // Position the player in the world (adjust as needed)
-        player.position.set(62, .4, -118.15);
-        player.scale.set(1,1,1)
+            // Initialize velocity and position
+            player.velocity = new THREE.Vector3(0, 0, 0);
+            player.position.set(62, .4, -118.15);
+            player.scale.set(1, 1, 1);
+
+            resolve();  // Resolve the promise since the model has loaded
+        },
+            undefined,
+            (error) => {
+                console.error('An error occurred while loading the model');
+                reject(error);  // Reject the promise if there's an error
+            });
     });
 }
 

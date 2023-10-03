@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { player } from './player.js';  // Import your player object
-import { ball, ballVelocity } from './ball.js';
+import { ball } from './ball.js';
 import { ballBody } from './physics.js';
 import * as CANNON from 'cannon'
 
@@ -21,7 +21,7 @@ export function checkDistance(playerPosition, ballPosition) {
 export function applyMagneticEffect() {
     if (!player || !ball || !ballBody) return;  // Ensure all objects are available
 
-    const attractionStrength = 100;
+    const attractionStrength = 10;
     const distance = checkDistance(player.position, ball.position);
 
     if (distance < distanceThreshold) {
@@ -46,24 +46,27 @@ export function applyMagneticEffect() {
         // Apply the force to the ball's physics body
         ballBody.applyForce(attractionForce, ballBody.position);
 
-        console.log("Attraction Force:", attractionForce);
+        //console.log("Attraction Force:", attractionForce);
     }
 }
 
 export function updateBallPosition() {
-    if (!ball || !ball.position) {
-        console.error('Ball or ball.position is undefined');
+    if (!ball) {
+        console.error('Ball is undefined');
         return;
     }
-    const maxSpeed = 5;
-    if (ballVelocity.length() > maxSpeed) {
-        ballVelocity.normalize().multiplyScalar(maxSpeed);
+    if (!ball.position) {
+        console.error('Ball.position is undefined', ball);
+        return;
     }
 
-    ball.position.add(ballVelocity);
-    ballVelocity.multiplyScalar(0.9);
-    ball.updateMatrix();
-    //console.log("Ball Position:", ball.position);
+    const maxSpeed = 5;
+    if (ball.velocity.length() > maxSpeed) {
+        ball.velocity.normalize().multiplyScalar(maxSpeed);
+    }
+
+    ball.position.add(ball.velocity);
+    ball.velocity.multiplyScalar(0.9); // Damping factor to gradually reduce speed
 }
 
 function checkDistance(posA, posB) {

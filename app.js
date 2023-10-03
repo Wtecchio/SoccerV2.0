@@ -6,7 +6,8 @@ import { initPhysics, updatePhysics } from './resources/components/physics.js';
 import { initControls, updateControls } from './resources/components/controls.js';
 import { initPlayer, updatePlayer } from './resources/components/player.js';
 import { applyMagneticEffect, updateBallPosition } from './resources/components/magnet.js';
-import { updatePlayerState } from './resources/components/playerState.js';  // Adjust path as needed
+import { updatePlayerState } from './resources/components/playerState.js';
+import { initVectors, updateVectors } from './resources/components/debugVectors.js';  // Adjust path as needed
 //import { initScore, updateScore } from './resources/components/score.js';
 //import { animate } from './resources/components/animations.js';
 
@@ -27,14 +28,19 @@ import { updatePlayerState } from './resources/components/playerState.js';  // A
     createField();
 
     // Create ball
-    createBall();
+    await createBall();
+
+
 
     // Initialize physics
-    initPhysics();
+    await initPhysics();
 
     //Initialize player
-    initPlayer();
+    await initPlayer();
 
+
+    //DEBUG PHYSICS VECTORS
+    initVectors();
 
     // Initialize controls
     //initControls();
@@ -72,6 +78,8 @@ import { updatePlayerState } from './resources/components/playerState.js';  // A
 
         // Update player state based on current conditions
         updatePlayerState();  
+
+        updateVectors();
 
         // Update scoring system
        // updateScore();
