@@ -21,53 +21,39 @@ export function checkDistance(playerPosition, ballPosition) {
 export function applyMagneticEffect() {
     if (!player || !ball || !ballBody) return;  // Ensure all objects are available
 
-    const attractionStrength = 10;
+    const attractionStrength = 1200;
+    const dampingStrength = 9999999;
     const distance = checkDistance(player.position, ball.position);
 
     if (distance < distanceThreshold) {
-        const offset = new THREE.Vector3(0, .86, -0.5);
+        const offset = new THREE.Vector3(0, .1, .75);
+        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
+
         const targetPosition = player.position.clone().add(offset);
 
         // Calculate the attraction force vector in Cannon.js format
-        const attractionForce = new CANNON.Vec3(
+        let attractionForce = new CANNON.Vec3(
             targetPosition.x - ball.position.x,
             targetPosition.y - ball.position.y,
             targetPosition.z - ball.position.z
         );
 
-        attractionForce.normalize();  // Normalizes the vector in place
+        const speed = ballBody.velocity.length();
+        if (speed > 0.5 && distance < (distanceThreshold * 0.1)) {
+            // Apply a damping force when close to the player to reduce the whirlpool effect
+            const dampingForce = ballBody.velocity.clone().scale(-1 * dampingStrength);
+            attractionForce.vadd(dampingForce, attractionForce);
+        }
 
-
-        // Manually scale the force vector by the attraction strength
-        attractionForce.x *= attractionStrength;
-        attractionForce.y *= attractionStrength;
-        attractionForce.z *= attractionStrength;
+        // Normalize and scale the attraction force
+        attractionForce.normalize();
+        attractionForce.scale(attractionStrength, attractionForce);
 
         // Apply the force to the ball's physics body
         ballBody.applyForce(attractionForce, ballBody.position);
-
-        //console.log("Attraction Force:", attractionForce);
     }
 }
 
-export function updateBallPosition() {
-    if (!ball) {
-        console.error('Ball is undefined');
-        return;
-    }
-    if (!ball.position) {
-        console.error('Ball.position is undefined', ball);
-        return;
-    }
-
-    const maxSpeed = 5;
-    if (ball.velocity.length() > maxSpeed) {
-        ball.velocity.normalize().multiplyScalar(maxSpeed);
-    }
-
-    ball.position.add(ball.velocity);
-    ball.velocity.multiplyScalar(0.9); // Damping factor to gradually reduce speed
-}
 
 function checkDistance(posA, posB) {
     return posA.distanceTo(posB);

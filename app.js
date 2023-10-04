@@ -5,7 +5,7 @@ import { createBall } from './resources/components/ball.js';
 import { initPhysics, updatePhysics } from './resources/components/physics.js';
 import { initControls, updateControls } from './resources/components/controls.js';
 import { initPlayer, updatePlayer } from './resources/components/player.js';
-import { applyMagneticEffect, updateBallPosition } from './resources/components/magnet.js';
+import { applyMagneticEffect } from './resources/components/magnet.js';
 import { updatePlayerState } from './resources/components/playerState.js';
 import { initVectors, updateVectors } from './resources/components/debugVectors.js';  // Adjust path as needed
 //import { initScore, updateScore } from './resources/components/score.js';
@@ -73,8 +73,6 @@ import { initVectors, updateVectors } from './resources/components/debugVectors.
         // Apply the magnetic effect between player and ball
         applyMagneticEffect();
 
-        // Update ball Position
-        updateBallPosition();
 
         // Update player state based on current conditions
         updatePlayerState();  

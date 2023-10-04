@@ -50,8 +50,10 @@ function initPhysics() {
             //
             if (ballBody) {
                 ballBody.addEventListener("collide", function (event) {
-                    console.log("Collision detected!");
-                    console.log("Collision detected with body id:", event.body.id);
+                    //console.log("Collision detected!");
+                    //console.log("Collision detected with body id:", event.body.id);
+                    //console.log("Ball velocity at time of collision:", ballBody.velocity);
+                    //console.log("Applied magnetic force at time of collision:", /* your magnetic force variable */);
 
                     // Get the contact normal. Note: this may need to be flipped to point in the correct direction.
                     const contactNormal = event.contact.ni;
@@ -122,7 +124,25 @@ function updatePhysics(deltaTime) {
         ballWireframe.position.copy(ballBody.position);
         ballWireframe.quaternion.copy(ballBody.quaternion);
 
+        // Here you can enforce max speed or apply damping directly to the physics object
+        const maxSpeed = 15;
+        const velocityLength = Math.sqrt(
+            Math.pow(ballBody.velocity.x, 2) +
+            Math.pow(ballBody.velocity.y, 2) +
+            Math.pow(ballBody.velocity.z, 2)
+        );
+
+        if (velocityLength > maxSpeed) {
+            const scale = maxSpeed / velocityLength;
+            ballBody.velocity.scale(scale, ballBody.velocity);
+        }
+
+        // Apply damping factor directly to physics object to gradually reduce speed
+        ballBody.velocity.scale(0.99, ballBody.velocity);
+
         // Update ball's velocity in Three.js to reflect physics velocity
+        // This is just for keeping any Three.js related logic in sync with physics,
+        // you shouldn't be using this for any actual physics calculations
         ball.velocity.set(ballBody.velocity.x, ballBody.velocity.y, ballBody.velocity.z);
     }
 }
