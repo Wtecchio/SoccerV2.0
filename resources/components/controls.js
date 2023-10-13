@@ -40,6 +40,12 @@ document.addEventListener('keydown', function (event) {
         case 'KeyD':
             keyState.d = true;
             break;
+        case 'KeyQ':
+            keyState.q = true;
+            break;
+        case 'KeyE':
+            keyState.e = true;
+            break;
     }
 });
 
@@ -57,6 +63,12 @@ document.addEventListener('keyup', function (event) {
             break;
         case 'KeyD':
             keyState.d = false;
+            break;
+        case 'KeyQ':
+            keyState.q = true;
+            break;
+        case 'KeyE':
+            keyState.e = true;
             break;
     }
 });
@@ -80,10 +92,7 @@ function initControls() {
 }
 
 
-//VARIABLES FOR SPHERE AROUND PLAYER AND CAMERA CLAMPS SUPER IMPORTANT
-let theta = Math.PI / 4; // Initialize to some angle
-let phi = Math.PI / 4; // Initialize to some angle
-let radius = 10; // The distance from the player to the camera
+
 
 
 //Making sure mouse doesn't go off screen
@@ -210,42 +219,62 @@ document.addEventListener('mousemove', function (event) {
 
 
 
+//VARIABLES FOR SPHERE AROUND PLAYER AND CAMERA CLAMPS SUPER IMPORTANT
+let theta = Math.PI / 4; // Initialize to some angle
+let phi = Math.PI / 4; // Initialize to some angle
+let radius = 10; // The distance from the player to the camera
 
+let currentSpeed = 0;  // Store the current speed of the player
+const maxSpeed = 0.11;  // Maximumd speed of the player
+const acceleration = 0.005;  // Acceleration rate
+const deceleration = 0.01;  // Deceleration rate
+const turnSpeed = 0.007;  // Turn speed for changing direction
 
 function updateControls() {
-
-
-    // If you want the camera to follow the player
     if (player) {
-
-        const speed = 0.1;  // replace with your actual speed
         let moveDirection = new THREE.Vector3();
 
-        // Initialize moveDirection based on pressed keys
-        if (keyState.w) {
-            moveDirection.z = 1;  // Moving forward
-        }
-        if (keyState.d) {
-            moveDirection.x = -1;  // Moving left
-        }
-        if (keyState.s) {
-            moveDirection.z = -1;  // Moving backward
-        }
-        if (keyState.a) {
-            moveDirection.x = 1;  // Moving right
-        }
+        // Determine the desired direction based on pressed keys
+        if (keyState.w) moveDirection.z += 1;
+        if (keyState.s) moveDirection.z -= 1;
+        if (keyState.q) moveDirection.x += 1;  // Moving left
+        if (keyState.e) moveDirection.x -= 1;  // Moving right
 
-        // Normalize the vector to ensure consistent speed in all directions
-        moveDirection.normalize();
+        // Normalize the vector to get direction, then multiply by the player's current speed
+        moveDirection.normalize().multiplyScalar(currentSpeed);
 
         // Rotate moveDirection by player's current rotation
         moveDirection.applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
 
-        // Update player position
-        player.position.addScaledVector(moveDirection, speed);
+        // Turning the player
+        if (keyState.a) player.rotation.y += turnSpeed;  // Turn left
+        if (keyState.d) player.rotation.y -= turnSpeed;  // Turn right
 
-        // Update player velocity
-        player.velocity = moveDirection.clone().multiplyScalar(speed);
+        // Update player position
+        player.position.addScaledVector(moveDirection, 1);
+
+        // Update the player's current speed based on whether a move key is pressed
+        if (keyState.w || keyState.q || keyState.s || keyState.e) {
+            currentSpeed += acceleration;
+            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+        } else {
+            currentSpeed -= deceleration;
+            if (currentSpeed < 0) currentSpeed = 0;
+        }
+
+        // Update player velocity for other uses (e.g., interaction with ball)
+        player.velocity = moveDirection;
+
+
+        // Turning the player also turns the camera
+        if (keyState.a) {
+            player.rotation.y += turnSpeed;  // Turn left
+            theta -= turnSpeed * 2;  // Rotate camera
+        }
+        if (keyState.d) {
+            player.rotation.y -= turnSpeed;  // Turn right
+            theta += turnSpeed * 2;  // Rotate camera
+        }
 
 
         // Calculate the camera's position using spherical coordinates
