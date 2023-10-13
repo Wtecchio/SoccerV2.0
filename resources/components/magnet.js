@@ -5,48 +5,65 @@ import { ballBody } from './physics.js';
 import * as CANNON from 'cannon'
 
 
-// Define a distance threshold for the magnetic effect
-const distanceThreshold = 1.0;  // Adjust this value as needed
-let ballStopped = false;  // Add this state flag at an appropriate scope level
-
-
 
 export function applyMagneticEffect() {
-    if (!player || !ball || !ballBody) return;  // Ensure all objects are available
+    if (!player || !ball || !ballBody) return;
+
+    const baseAttractionStrength = 300;
+    const stoppingDistance = 0.02;
+    const distanceThreshold = 1.5;
+    const speedMultiplier = 5;
+    const dampingStrength = 1000;
 
     const distance = checkDistance(player.position, ball.position);
-
-    // Use a constant attraction strength for testing
-    const attractionStrength = 150;
-
-    // Velocity thresholds for 'resting' state
-    const minPlayerSpeed = 0.1;
-    const minBallSpeed = .14;
+    const playerSpeed = player.velocity.length();
 
     if (distance < distanceThreshold) {
-        if (player.velocity.length() < minPlayerSpeed && ballBody.velocity.length() < minBallSpeed) {
-            // If both the player and the ball are nearly at rest, stop the ball
+        if (playerSpeed < 0.01) {
+            // If player is almost stationary, lock the ball in place
             ballBody.velocity.set(0, 0, 0);
+            ballBody.angularVelocity.set(0, 0, 0); // Optionally stop the ball from rotating as well
         } else {
-            // Directly set the target position to the player's position for testing
-            const targetPosition = player.position.clone();
+            // If player is moving, apply attraction force
+            const dynamicAttractionStrength = baseAttractionStrength * (1 + speedMultiplier * playerSpeed);
 
-            // Calculate the attraction force vector in Cannon.js format
+            // Calculate the offset position in front of the player
+            const playerDirection = player.velocity.clone().normalize();
+            const offsetDistance = 1.1;  // Set this to how far in front of the player you want the ball
+            const offsetPosition = playerDirection.clone().multiplyScalar(offsetDistance);
+
+            // Adjust target position to be in front of the player
+            const targetPosition = player.position.clone().add(offsetPosition);;
+
             let attractionForce = new CANNON.Vec3(
                 targetPosition.x - ball.position.x,
                 targetPosition.y - ball.position.y,
                 targetPosition.z - ball.position.z
             );
 
-            // Normalize and scale the attraction force
             attractionForce.normalize();
-            attractionForce.scale(attractionStrength, attractionForce);
+            attractionForce.scale(dynamicAttractionStrength, attractionForce);
 
-            // Apply the force to the ball's physics body
-            ballBody.applyForce(attractionForce, ballBody.position);
+            if (distance < stoppingDistance) {
+                // Apply strong damping
+                const dampingForce = ballBody.velocity.clone().scale(-dampingStrength);
+                ballBody.applyForce(dampingForce, ballBody.position);
+            } else {
+                // Apply attraction force
+                ballBody.applyForce(attractionForce, ballBody.position);
+            }
         }
+
+        ballBody.wakeUp();
     }
 }
+
+
+
+
+
+
+
 
 
 function checkDistance(posA, posB) {

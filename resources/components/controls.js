@@ -225,23 +225,47 @@ let phi = Math.PI / 4; // Initialize to some angle
 let radius = 10; // The distance from the player to the camera
 
 let currentSpeed = 0;  // Store the current speed of the player
-const maxSpeed = 0.11;  // Maximumd speed of the player
-const acceleration = 0.005;  // Acceleration rate
+const maxSpeed = 0.16;  // Maximumd speed of the player
+const acceleration = 0.008;  // Acceleration rate
 const deceleration = 0.01;  // Deceleration rate
 const turnSpeed = 0.007;  // Turn speed for changing direction
+const directionLerpFactor = 0.1;  // Factor for interpolating direction changes
+
+let currentDirection = new THREE.Vector3();  // Current movement direction
+let desiredDirection = new THREE.Vector3();  // Desired movement direction based on key presses
 
 function updateControls() {
     if (player) {
-        let moveDirection = new THREE.Vector3();
+        // Reset desiredDirection
+        desiredDirection.set(0, 0, 0);
 
         // Determine the desired direction based on pressed keys
-        if (keyState.w) moveDirection.z += 1;
-        if (keyState.s) moveDirection.z -= 1;
-        if (keyState.q) moveDirection.x += 1;  // Moving left
-        if (keyState.e) moveDirection.x -= 1;  // Moving right
+        if (keyState.w) desiredDirection.z = 1;
+        if (keyState.s) desiredDirection.z = -1;
+        if (keyState.q) desiredDirection.x = 1;
+        if (keyState.e) desiredDirection.x = -1;
 
-        // Normalize the vector to get direction, then multiply by the player's current speed
-        moveDirection.normalize().multiplyScalar(currentSpeed);
+        desiredDirection.normalize();
+
+        // Reset the lerp when changing direction or coming to a stop
+        if ((currentDirection.dot(desiredDirection) < 0 && currentSpeed < 0.1) || (!keyState.w && !keyState.q && !keyState.s && !keyState.e)) {
+            currentDirection.copy(desiredDirection);
+        }
+
+        // Smoothly interpolate from the current direction to the desired direction
+        currentDirection.lerp(desiredDirection, directionLerpFactor);
+
+        // Update the player's current speed based on whether a move key is pressed
+        if (keyState.w || keyState.q || keyState.s || keyState.e) {
+            currentSpeed += acceleration;
+            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+        } else {
+            currentSpeed -= deceleration;
+            if (currentSpeed < 0) currentSpeed = 0;
+        }
+
+        // Multiply by the player's current speed to get the movement vector
+        let moveDirection = currentDirection.clone().multiplyScalar(currentSpeed);
 
         // Rotate moveDirection by player's current rotation
         moveDirection.applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
@@ -252,15 +276,6 @@ function updateControls() {
 
         // Update player position
         player.position.addScaledVector(moveDirection, 1);
-
-        // Update the player's current speed based on whether a move key is pressed
-        if (keyState.w || keyState.q || keyState.s || keyState.e) {
-            currentSpeed += acceleration;
-            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
-        } else {
-            currentSpeed -= deceleration;
-            if (currentSpeed < 0) currentSpeed = 0;
-        }
 
         // Update player velocity for other uses (e.g., interaction with ball)
         player.velocity = moveDirection;
