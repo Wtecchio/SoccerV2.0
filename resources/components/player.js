@@ -1,9 +1,13 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { scene } from './scene.js';  // Adjust the import to match your project structure
+import { getPlayerState, PlayerStates } from './playerState.js';  // import getPlayerState and PlayerStates
 
 export let player;  // This will store our loaded player model
+export let mixer;  // Declare it as exportable
 let playerAnimations = {};  // We will store the animations here
+let idleAction, runAction, walkAction;  // Declare these at the top of your file
+
 
 
 function initPlayer() {
@@ -20,10 +24,26 @@ function initPlayer() {
                 playerAnimations[clip.name] = clip;
             });
 
+            gltf.animations.forEach((clip) => {
+                console.log("Loaded clip:", clip.name);
+                playerAnimations[clip.name] = clip;
+            });
+
             // Play the idle animation by default
-            const mixer = new THREE.AnimationMixer(player);
-            const action = mixer.clipAction(playerAnimations["HumanArmature|Man_Idle"]);
-            action.play();
+            mixer = new THREE.AnimationMixer(player);//important
+        
+
+            // Set up idle animation
+            idleAction = mixer.clipAction(playerAnimations["HumanArmature|Man_Idle"]);
+            idleAction.play();
+
+            // Assuming you have the run and walk animations named as "HumanArmature|Man_Run" and "HumanArmature|Man_Walk"
+            // Set up run animation
+            runAction = mixer.clipAction(playerAnimations["HumanArmature|Man_Run"]);
+
+            // Set up walk animation
+            walkAction = mixer.clipAction(playerAnimations["HumanArmature|Man_Walk"]);
+
 
             // Initialize velocity and position
             player.velocity = new THREE.Vector3(0, 0, 0);
@@ -41,7 +61,16 @@ function initPlayer() {
 }
 
 function updatePlayer() {
-    // This function will later be filled with code to update the player's position and animations based on user input
+    const currentState = getPlayerState();
+
+    if (currentState === PlayerStates.RUNNING) {
+        idleAction.stop();
+        runAction.play();
+    } else {
+        runAction.stop();
+        idleAction.play();
+    }
+    
 }
 
 export { initPlayer, updatePlayer };

@@ -7,27 +7,23 @@ import * as CANNON from 'cannon'
 
 // Define a distance threshold for the magnetic effect
 const distanceThreshold = 1.0;  // Adjust this value as needed
+let ballStopped = false;  // Add this state flag at an appropriate scope level
 
-/*
-// Function to check the distance between two 3D points
-export function checkDistance(playerPosition, ballPosition) {
-    const distanceVector = new THREE.Vector3().subVectors(playerPosition, ballPosition);
-    const distance = distanceVector.length();
-    return distance;
-}
 
-*/
 
 export function applyMagneticEffect() {
     if (!player || !ball || !ballBody) return;  // Ensure all objects are available
 
-    const attractionStrength = 1200;
+    const attractionStrength = 60;
     const dampingStrength = 9999999;
     const distance = checkDistance(player.position, ball.position);
+    const minVelocity = 0.1; // Added this line
 
     if (distance < distanceThreshold) {
-        const offset = new THREE.Vector3(0, .1, .75);
-        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
+        const playerDirection = player.velocity.clone().normalize();
+        const offset = playerDirection.clone().multiplyScalar(0.8);
+        offset.setY(0.1);
+
 
         const targetPosition = player.position.clone().add(offset);
 
@@ -39,11 +35,34 @@ export function applyMagneticEffect() {
         );
 
         const speed = ballBody.velocity.length();
+
+
+        // Reset the flag as the ball is not stopped.
+        ballStopped = false;
+
         if (speed > 0.5 && distance < (distanceThreshold * 0.1)) {
-            // Apply a damping force when close to the player to reduce the whirlpool effect
-            const dampingForce = ballBody.velocity.clone().scale(-1 * dampingStrength);
+            // Calculate the component of the ball's velocity that is perpendicular to the player's velocity
+            const parallelComponent = ballBody.velocity.dot(playerDirection);
+            const parallelVelocity = playerDirection.clone().scale(parallelComponent);
+            const perpendicularVelocity = ballBody.velocity.clone().vsub(parallelVelocity);
+
+            // Apply a damping force only in the perpendicular direction
+            const dampingForce = perpendicularVelocity.scale(-1 * dampingStrength);
             attractionForce.vadd(dampingForce, attractionForce);
         }
+
+
+        if (attractionForce) {
+            console.log("Attraction Force:", JSON.stringify(attractionForce));
+        }
+        if (player && player.velocity) {
+            console.log("Player Velocity:", JSON.stringify(player.velocity));
+
+        }
+        if (ballBody && ballBody.velocity) {
+            console.log("Ball Velocity:", JSON.stringify(ballBody.velocity));
+        }
+
 
         // Normalize and scale the attraction force
         attractionForce.normalize();
@@ -58,5 +77,4 @@ export function applyMagneticEffect() {
 function checkDistance(posA, posB) {
     return posA.distanceTo(posB);
 }
-
 

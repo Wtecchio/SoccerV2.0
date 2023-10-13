@@ -4,7 +4,7 @@ import { createField } from './resources/components/field.js';
 import { createBall } from './resources/components/ball.js';
 import { initPhysics, updatePhysics } from './resources/components/physics.js';
 import { initControls, updateControls } from './resources/components/controls.js';
-import { initPlayer, updatePlayer } from './resources/components/player.js';
+import { initPlayer, updatePlayer, mixer } from './resources/components/player.js';
 import { applyMagneticEffect } from './resources/components/magnet.js';
 import { updatePlayerState } from './resources/components/playerState.js';
 import { initVectors, updateVectors } from './resources/components/debugVectors.js';  // Adjust path as needed
@@ -53,6 +53,7 @@ import { initVectors, updateVectors } from './resources/components/debugVectors.
 
 
     let previousTime = performance.now();
+
     // Main game loop
     function gameLoop(currentTime) {
 
@@ -77,7 +78,12 @@ import { initVectors, updateVectors } from './resources/components/debugVectors.
         // Update player state based on current conditions
         updatePlayerState();  
 
+        //for debugging vector forces debug when done
         updateVectors();
+
+        if (mixer) {  // Check if mixer exists
+            mixer.update(deltaTime);
+        }
 
         // Update scoring system
        // updateScore();

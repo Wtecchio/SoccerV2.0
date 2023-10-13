@@ -86,8 +86,10 @@ function initPhysics() {
             //END OF VECTOR DEBUG
             //
 
-
+            /*
+            //
             // Create a wireframe visualization for the ball's physics body FOR DEBUGGING ONLY
+            //
             const wireframeGeometry = new THREE.SphereGeometry(.5);
             const wireframeMaterial = new THREE.MeshBasicMaterial({
                 color: 0xff0000,
@@ -96,6 +98,8 @@ function initPhysics() {
             ballWireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
             ballWireframe.position.set(59, 5, -118.15)
             scene.add(ballWireframe);
+            */
+            
 
             // Resolve the promise to indicate that physics initialization is complete
             resolve();
@@ -121,8 +125,8 @@ function updatePhysics(deltaTime) {
         ball.quaternion.copy(ballBody.quaternion);
 
         // Synchronize the wireframe with the physics object:
-        ballWireframe.position.copy(ballBody.position);
-        ballWireframe.quaternion.copy(ballBody.quaternion);
+        //ballWireframe.position.copy(ballBody.position);
+        //ballWireframe.quaternion.copy(ballBody.quaternion);
 
         // Here you can enforce max speed or apply damping directly to the physics object
         const maxSpeed = 15;
