@@ -4,6 +4,9 @@ import { ball } from './ball.js';
 import { ballBody } from './physics.js';
 import * as CANNON from 'cannon'
 
+let lastAttractionForce = new CANNON.Vec3(0, 0, 0);  // Initialize outside the function
+const lerpFactor = 0.2;  // The amount to interpolate between the last and current force
+
 export function applyMagneticEffect() {
     if (!player || !ball || !ballBody) return;
 
@@ -12,6 +15,7 @@ export function applyMagneticEffect() {
     const distanceThreshold = 1.5;
     const speedMultiplier = 5;
     const dampingStrength = 500;
+    const maxBallVelocity = 10;  // The maximum speed the ball can have when close to the player.
 
     const distance = checkDistance(player.position, ball.position);
     const playerSpeed = player.velocity.length();
@@ -25,14 +29,11 @@ export function applyMagneticEffect() {
         } else {
             const dynamicAttractionStrength = baseAttractionStrength * (1 + speedMultiplier * playerSpeed);
 
-            // Calculate the offset position in front of the player
             const forward = new THREE.Vector3(0, 0, 1);
             forward.applyEuler(player.rotation);
 
             const offsetDistance = 1.1;
             const offsetPosition = forward.clone().multiplyScalar(offsetDistance);
-
-            // Adjust target position to be in front of the player
             const targetPosition = player.position.clone().add(offsetPosition);
 
             let attractionForce = new CANNON.Vec3(
@@ -52,11 +53,15 @@ export function applyMagneticEffect() {
             }
         }
 
+        // Clamp the velocity if it exceeds maximum allowed velocity
+        if (ballBody.velocity.length() > maxBallVelocity) {
+            ballBody.velocity.normalize();
+            ballBody.velocity.scale(maxBallVelocity, ballBody.velocity);
+        }
+
         ballBody.wakeUp();
     }
 }
-
-
 
 
 

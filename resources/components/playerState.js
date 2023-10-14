@@ -50,7 +50,7 @@ export function updatePlayerState() {
 
     // Example logic to update 'hasBall' based on distance to ball
     const distance = player.position.distanceTo(ball.position);  // Replace with your actual logic
-    if (distance < 1.1) {
+    if (distance < 1.2) {
         hasBall = true;
     } else {
         hasBall = false;
