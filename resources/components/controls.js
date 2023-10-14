@@ -225,11 +225,16 @@ let phi = Math.PI / 4; // Initialize to some angle
 let radius = 10; // The distance from the player to the camera
 
 let currentSpeed = 0;  // Store the current speed of the player
-const maxSpeed = 0.16;  // Maximumd speed of the player
+const maxSpeed = 0.11;  // Maximumd speed of the player
 const acceleration = 0.008;  // Acceleration rate
 const deceleration = 0.01;  // Deceleration rate
 const turnSpeed = 0.007;  // Turn speed for changing direction
 const directionLerpFactor = 0.1;  // Factor for interpolating direction changes
+
+const forwardSpeed = maxSpeed;  // Maximum speed when moving forward
+const backwardSpeed = maxSpeed * 0.4;  // Maximum speed when moving backward
+const lateralSpeed = maxSpeed * 0.6;  // Maximum speed when moving laterally
+
 
 let currentDirection = new THREE.Vector3();  // Current movement direction
 let desiredDirection = new THREE.Vector3();  // Desired movement direction based on key presses
@@ -247,6 +252,12 @@ function updateControls() {
 
         desiredDirection.normalize();
 
+        // Apply different speed limits based on movement direction
+        let speedLimit = maxSpeed;
+        if (desiredDirection.z > 0) speedLimit = forwardSpeed;
+        if (desiredDirection.z < 0) speedLimit = backwardSpeed;
+        if (desiredDirection.x !== 0) speedLimit = lateralSpeed;
+
         // Reset the lerp when changing direction or coming to a stop
         if ((currentDirection.dot(desiredDirection) < 0 && currentSpeed < 0.1) || (!keyState.w && !keyState.q && !keyState.s && !keyState.e)) {
             currentDirection.copy(desiredDirection);
@@ -258,7 +269,7 @@ function updateControls() {
         // Update the player's current speed based on whether a move key is pressed
         if (keyState.w || keyState.q || keyState.s || keyState.e) {
             currentSpeed += acceleration;
-            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+            if (currentSpeed > speedLimit) currentSpeed = speedLimit;  // Use speedLimit instead of maxSpeed
         } else {
             currentSpeed -= deceleration;
             if (currentSpeed < 0) currentSpeed = 0;

@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { player } from './player.js';  // Import your player object
 import { ball } from './ball.js';
 
@@ -7,7 +8,8 @@ export const PlayerStates = {
     RUNNING: 'running',
     DRIBBLING: 'dribbling',
     KICKING: 'kicking',
-    SPRINTING: 'sprinting'
+    SPRINTING: 'sprinting',
+    WALKING_BACKWARD: 'walking_backward'
     // ... any other states you need
 };
 
@@ -26,9 +28,29 @@ export function updatePlayerState() {
         currentState = PlayerStates.IDLE;
     }
 
+    //walk animation for going backwards
+    if (player.velocity.length() > 0) {
+        // Get the forward vector of the player
+        const forward = new THREE.Vector3(0, 0, -1);
+        forward.applyQuaternion(player.quaternion);
+
+        // Calculate the angle between forward vector and velocity
+        const angle = forward.angleTo(player.velocity) * (180 / Math.PI);
+
+        // Decide the state based on the angle
+        if (angle > 90) {
+            currentState = PlayerStates.RUNNING;
+        } else {
+            currentState = PlayerStates.WALKING_BACKWARD;
+        }
+    } else {
+        currentState = PlayerStates.IDLE;
+    }
+    
+
     // Example logic to update 'hasBall' based on distance to ball
     const distance = player.position.distanceTo(ball.position);  // Replace with your actual logic
-    if (distance < 1.0) {
+    if (distance < 1.1) {
         hasBall = true;
     } else {
         hasBall = false;

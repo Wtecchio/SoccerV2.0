@@ -60,6 +60,7 @@ function initPlayer() {
     });
 }
 
+/*
 function updatePlayer() {
     const currentState = getPlayerState();
 
@@ -71,6 +72,37 @@ function updatePlayer() {
         idleAction.play();
     }
     
+}
+*/
+
+let lastState = null;  // Keep track of the last state
+
+function updatePlayer() {
+    const currentState = getPlayerState();
+
+    if (currentState !== lastState) {
+        // Stop all actions first
+        idleAction.stop();
+        runAction.stop();
+        walkAction.stop();
+
+        // Reset timeScale for all actions
+        idleAction.timeScale = 1;
+        runAction.timeScale = 1;
+        walkAction.timeScale = 1;
+
+        // Play the appropriate action based on current state
+        if (currentState === PlayerStates.RUNNING) {
+            runAction.play();
+        } else if (currentState === PlayerStates.WALKING_BACKWARD) {
+            walkAction.timeScale = -1;  // Play backward
+            walkAction.play();
+        } else {
+            idleAction.play();
+        }
+
+        lastState = currentState;
+    }
 }
 
 export { initPlayer, updatePlayer };
