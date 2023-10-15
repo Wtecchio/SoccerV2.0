@@ -25,6 +25,7 @@ const keyState = {
     ' ':false
 };
 
+
 // Listen for keydown events
 document.addEventListener('keydown', function (event) {
     switch (event.code) {

@@ -1,4 +1,4 @@
-import { getPlayerState, getHasBall } from './playerState.js';
+import { getPlayerState, getHasBall, updatePlayerState } from './playerState.js';
 
 // Define key mappings for actions
 const keyMappings = {
@@ -23,6 +23,8 @@ export function handleActions(keyState) {
     if (keyState[keyMappings.passSlide]) {
         if (playerState === 'running' && !hasBall) {
             // Execute sliding logic here
+            //console.log("Triggering slide");  // Add this line for debugging
+            updatePlayerState(true);  // Trigger slide
             console.log("Sliding!");
         } else if (hasBall) {
             // Execute passing logic here

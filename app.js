@@ -42,6 +42,10 @@ import { initVectors, updateVectors } from './resources/components/debugVectors.
     //DEBUG PHYSICS VECTORS
     initVectors();
 
+    if (mixer) {
+        console.log("Available actions in mixer:", mixer._actions);
+    }
+
     // Initialize controls
     //initControls();
 
@@ -62,11 +66,15 @@ import { initVectors, updateVectors } from './resources/components/debugVectors.
         const deltaTime = (currentTime - previousTime) / 1000;
         previousTime = currentTime;
 
-        // Update player
-        updatePlayer();
-
         // Update controls
         updateControls();
+
+        // Update player state based on current conditions
+        updatePlayerState();  
+
+        // Update player
+        updatePlayer(deltaTime);
+
 
         // Update physics
         updatePhysics(deltaTime);
@@ -75,8 +83,6 @@ import { initVectors, updateVectors } from './resources/components/debugVectors.
         applyMagneticEffect();
 
 
-        // Update player state based on current conditions
-        updatePlayerState();  
 
         //for debugging vector forces debug when done
         updateVectors();

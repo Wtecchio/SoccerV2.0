@@ -9,17 +9,37 @@ export const PlayerStates = {
     DRIBBLING: 'dribbling',
     KICKING: 'kicking',
     SPRINTING: 'sprinting',
-    WALKING_BACKWARD: 'walking_backward'
+    WALKING_BACKWARD: 'walking_backward',
+    SLIDING: 'sliding'
     // ... any other states you need
 };
 
 let currentState = PlayerStates.IDLE;
 let hasBall = false;
+let slideTriggered = false;  // New variable to track if slide has been triggered
 
-export function updatePlayerState() {
+let slidingCounter = 0;  // Add this counter outside the function
 
+export function updatePlayerState(isSlideTriggered = false) {
+    //console.log("Before updatePlayerState:", currentState); // Debug line
+    slideTriggered = isSlideTriggered;
 
     if (!player || !ball) return;
+
+    // If the sliding counter is active, decrement it
+    if (slidingCounter > 0) {
+        slidingCounter--;
+        return;  // Do not update the state while sliding
+    }
+
+    // Check if slide has been triggered
+    if (slideTriggered) {
+        currentState = PlayerStates.SLIDING;
+        //console.log("Slide triggered, changing state to SLIDING");
+        slideTriggered = false;
+        slidingCounter = 54;  // Set the counter to 54 frames
+        return;
+    }
 
     // Example logic to update state based on player's velocity
     if (player.velocity.length() > 0) {  // Replace with your actual logic
@@ -28,7 +48,7 @@ export function updatePlayerState() {
         currentState = PlayerStates.IDLE;
     }
 
-    //walk animation for going backwards
+    // Walk animation for going backward
     if (player.velocity.length() > 0) {
         // Get the forward vector of the player
         const forward = new THREE.Vector3(0, 0, -1);
@@ -46,20 +66,16 @@ export function updatePlayerState() {
     } else {
         currentState = PlayerStates.IDLE;
     }
-    
 
     // Example logic to update 'hasBall' based on distance to ball
     const distance = player.position.distanceTo(ball.position);  // Replace with your actual logic
-    if (distance < 1.2) {
+    if (distance < 1.3) {
         hasBall = true;
     } else {
         hasBall = false;
     }
 
-    //console.log("Current State:", currentState);
-    //console.log("Has Ball:", hasBall);
-
-
+    //console.log("After updatePlayerState:", currentState); // Debug line
 }
 
 export function getPlayerState() {
