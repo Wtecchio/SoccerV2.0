@@ -7,26 +7,20 @@ export let player;
 export let mixer;
 let idleAction, runAction, walkAction, slideAction;
 
-
 // Initialize the player
 function initPlayer() {
     return new Promise((resolve, reject) => {
         const fbxLoader = new FBXLoader();
         console.log('Initializing player');
 
-        // Load the new FBX player model
-        fbxLoader.load('models/athleteModels/newMan.fbx', (fbx) => {
-            console.log("FBX Loaded:", fbx);  // Debug line
+        // Load the new FBX Droid model
+        fbxLoader.load('models/athleteModels/Droid/BattleDroid.fbx', (fbx) => {
+            console.log("FBX Loaded:", fbx);
 
             player = fbx;
-
-            // Scale the player
-            const scaleValue = 1;  // Replace with the scale you want
+            const scaleValue = 1;
             player.scale.set(scaleValue, scaleValue, scaleValue);
-
-
             scene.add(player);
-
 
             // Initialize the animation mixer
             mixer = new THREE.AnimationMixer(player);
@@ -36,24 +30,21 @@ function initPlayer() {
             const animationActions = [];
 
             animationFiles.forEach((file, index) => {
-                fbxLoader.load(`models/athleteModels/animations/${file}`, (animFbx) => {
+                fbxLoader.load(`models/athleteModels/Droid/animations/${file}`, (animFbx) => {
                     const clip = animFbx.animations[0];
+
+                    // Remove translation from all animations
                     removeTranslationFromAnimation(clip);
+
                     const action = mixer.clipAction(clip);
                     animationActions.push(action);
 
                     if (index === animationFiles.length - 1) {
                         [walkAction, idleAction, runAction, slideAction] = animationActions;
-
-                        // Setting default action to idle
                         idleAction.play();
-
-                        // Initialize player attributes
                         player.velocity = new THREE.Vector3(0, 0, 0);
                         player.position.set(62, .4, -118.15);
-                        player.scale.set(1, 1, 1);
-
-
+                        player.scale.set(2, 2, 2);
                         resolve();
                     }
                 }, undefined, reject);
@@ -61,7 +52,6 @@ function initPlayer() {
         }, undefined, reject);
     });
 }
-
 //
 //UPDATE PLAYER FUNCTION
 //
@@ -126,7 +116,7 @@ function updatePlayer() {
 
 function removeTranslationFromAnimation(clip) {
     clip.tracks = clip.tracks.filter(track => {
-        return !/\.position/.test(track.name);
+        return !track.name.endsWith('.position');
     });
 }
 
