@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { scene } from './scene.js';
 import { getPlayerState, PlayerStates } from './playerState.js';
+import { wKeyReleasedAfterSlide } from './controls.js';
 
 export let player;
 export let mixer;
@@ -84,7 +85,13 @@ function updatePlayer() {
 
         switch (currentState) {
             case PlayerStates.RUNNING:
-                runAction.play();  // Corrected here
+                if (wKeyReleasedAfterSlide) {
+                    runAction.play();
+                } else {
+                    // Here, choose an appropriate action when the 'W' key is not released after sliding.
+                    // For example, you could choose to continue the slide action or switch to idle.
+                    idleAction.play();
+                }
                 break;
             case PlayerStates.WALKING_BACKWARD:
                 walkAction.timeScale = 1;

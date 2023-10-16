@@ -25,7 +25,7 @@ const keyState = {
     ' ':false
 };
 
-let wKeyReleasedAfterSlide = true; // Initialize to true to allow running immediately
+export let wKeyReleasedAfterSlide = true; // Initialize to true to allow running immediately
 
 // Listen for keydown events
 document.addEventListener('keydown', function (event) {
@@ -244,36 +244,41 @@ const backwardSpeed = maxSpeed * 0.4;  // Maximum speed when moving backward
 const lateralSpeed = maxSpeed * 0.6;  // Maximum speed when moving laterally
 
 let slidingDeceleration = 1
-const slidingSpeedBoost = 3; // Add this to your constants; adjust as needed
+const slidingSpeedBoost = 3000; // Add this to your constants; adjust as needed
 let currentDirection = new THREE.Vector3();  // Current movement direction
 let desiredDirection = new THREE.Vector3();  // Desired movement direction based on key presses
 
-//Private bariablesw
-class Player {
-    constructor() {
-        this._isSliding = false; // private variable
-    }
-
-    get isSliding() {
-        return this._isSliding;
-    }
-
-    set isSliding(value) {
-        this._isSliding = value;
-    }
-}
-
+// Add a new flag to track speed boost
+let slideSpeedBoostActive = false;
 
 function updateControls() {
     if (player) {
-        // If sliding, restrict movement to forward only
         if (isSliding) {
-            desiredDirection.set(0, 0, 1);
-            currentSpeed -= slidingDeceleration;  // apply some deceleration during slide
+            if (!slideSpeedBoostActive) {
+                // Apply the speed boost once
+                currentSpeed += slidingSpeedBoost;
+                slideSpeedBoostActive = true;
+            }
+
+            // Apply deceleration
+            currentSpeed -= slidingDeceleration;
             if (currentSpeed < 0) currentSpeed = 0;
         } else {
+            slideSpeedBoostActive = false;
             // Reset desiredDirection
             desiredDirection.set(0, 0, 0);
+        }
+
+            // Handle the W key behavior during and after sliding
+            if (isSliding) {
+                if (keyState.w) {
+                    wKeyReleasedAfterSlide = false;
+                }
+            } else {
+                if (!keyState.w) {
+                    wKeyReleasedAfterSlide = true;
+                }
+
 
             // Determine the desired direction based on pressed keys
             if (keyState.w && wKeyReleasedAfterSlide) {
@@ -285,6 +290,8 @@ function updateControls() {
         }
 
         desiredDirection.normalize();
+
+
 
         // Apply different speed limits based on movement direction
         let speedLimit = maxSpeed;
@@ -316,8 +323,10 @@ function updateControls() {
         moveDirection.applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
 
         // Turning the player
-        if (keyState.a) player.rotation.y += turnSpeed;  // Turn left
-        if (keyState.d) player.rotation.y -= turnSpeed;  // Turn right
+        if (!isSliding) {
+            if (keyState.a) player.rotation.y += turnSpeed;  // Turn left
+            if (keyState.d) player.rotation.y -= turnSpeed;  // Turn right
+        }
 
         // Update player position
         player.position.addScaledVector(moveDirection, 1);
@@ -327,15 +336,16 @@ function updateControls() {
 
 
         // Turning the player also turns the camera
-        if (keyState.a) {
-            player.rotation.y += turnSpeed;  // Turn left
-            theta -= turnSpeed * 2;  // Rotate camera
+        if (!isSliding) {
+            if (keyState.a) {
+                player.rotation.y += turnSpeed;  // Turn left
+                theta -= turnSpeed * 2;  // Rotate camera
+            }
+            if (keyState.d) {
+                player.rotation.y -= turnSpeed;  // Turn right
+                theta += turnSpeed * 2;  // Rotate camera
+            }
         }
-        if (keyState.d) {
-            player.rotation.y -= turnSpeed;  // Turn right
-            theta += turnSpeed * 2;  // Rotate camera
-        }
-
 
         // Calculate the camera's position using spherical coordinates
         const x = player.position.x + radius * Math.sin(phi) * Math.cos(theta);
