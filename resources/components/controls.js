@@ -99,9 +99,6 @@ function initControls() {
 }
 
 
-
-
-
 //Making sure mouse doesn't go off screen
 let mouseIsDown = false;
 let isLeftButtonPressed = false;
@@ -243,26 +240,30 @@ const forwardSpeed = maxSpeed;  // Maximum speed when moving forward
 const backwardSpeed = maxSpeed * 0.4;  // Maximum speed when moving backward
 const lateralSpeed = maxSpeed * 0.6;  // Maximum speed when moving laterally
 
-let slidingDeceleration = 1
-const slidingSpeedBoost = 3000; // Add this to your constants; adjust as needed
+let slidingDeceleration = .009
 let currentDirection = new THREE.Vector3();  // Current movement direction
 let desiredDirection = new THREE.Vector3();  // Desired movement direction based on key presses
 
 // Add a new flag to track speed boost
 let slideSpeedBoostActive = false;
+let targetSpeed = 0;
 
 function updateControls() {
     if (player) {
         if (isSliding) {
+          
+
             if (!slideSpeedBoostActive) {
-                // Apply the speed boost once
-                currentSpeed += slidingSpeedBoost;
+                targetSpeed = .23; // or some other high value
+                currentSpeed = targetSpeed;
                 slideSpeedBoostActive = true;
             }
+            // Lerp-like deceleration
+            currentSpeed = (1 - slidingDeceleration) * currentSpeed;
 
-            // Apply deceleration
-            currentSpeed -= slidingDeceleration;
-            if (currentSpeed < 0) currentSpeed = 0;
+            if (currentSpeed < 0.009) {
+                currentSpeed = 0;
+            }
         } else {
             slideSpeedBoostActive = false;
             // Reset desiredDirection
@@ -308,12 +309,14 @@ function updateControls() {
         currentDirection.lerp(desiredDirection, directionLerpFactor);
 
         // Update the player's current speed based on whether a move key is pressed
-        if (keyState.w || keyState.q || keyState.s || keyState.e) {
-            currentSpeed += acceleration;
-            if (currentSpeed > speedLimit) currentSpeed = speedLimit;  // Use speedLimit instead of maxSpeed
-        } else {
-            currentSpeed -= deceleration;
-            if (currentSpeed < 0) currentSpeed = 0;
+        if (!isSliding) {  // Add this condition
+            if (keyState.w || keyState.q || keyState.s || keyState.e) {
+                currentSpeed += acceleration;
+                if (currentSpeed > speedLimit) currentSpeed = speedLimit;  // Use speedLimit instead of maxSpeed
+            } else {
+                currentSpeed -= deceleration;
+                if (currentSpeed < 0) currentSpeed = 0;
+            }
         }
 
         // Multiply by the player's current speed to get the movement vector

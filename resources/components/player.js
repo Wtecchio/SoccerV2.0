@@ -137,8 +137,8 @@ function initiateSliding() {
         const t = Math.min(elapsedTime / totalDurationMs, 1);
 
         // These thresholds determine when each phase of the piecewise function begins/ends
-        const threshold1 = 0.165;  // 10% of the total duration
-        const threshold2 = 0.6;  // 80% of the total duration
+        const threshold1 = 0.16;  // 10% of the total duration
+        const threshold2 = 0.55;  // 80% of the total duration
 
         if (t <= threshold1) {
             // Phase 1: Rapid decline

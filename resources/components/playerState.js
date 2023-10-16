@@ -35,9 +35,17 @@ export function updatePlayerState(isSlideTriggered = false) {
     // Check if slide has been triggered
     if (slideTriggered) {
         currentState = PlayerStates.SLIDING;
-        //console.log("Slide triggered, changing state to SLIDING");
         slideTriggered = false;
         slidingCounter = 54;  // Set the counter to 54 frames
+
+        // Check for interaction with the ball while sliding
+        const distanceToBall = player.position.distanceTo(ball.position);
+        if (distanceToBall < 1.3) {  // Replace with your actual collision detection logic
+            // Logic to apply force to the ball
+            ball.applySlideForce(player);  // Assuming you have an applySlideForce method in ball.js
+        }
+
+
         return;
     }
 
