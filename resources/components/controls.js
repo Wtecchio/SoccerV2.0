@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { camera, renderer } from './scene.js';
 import { OrbitControls } from '../jsLib/OrbitControls.js';  // Adjust the path if needed
-import { player } from './player.js';  // Import your player object
+import { player, isSliding } from './player.js';  // Import your player object
 import { handleActions } from './actionMapping.js';  // Import handleActions
 
 
@@ -25,12 +25,15 @@ const keyState = {
     ' ':false
 };
 
+let wKeyReleasedAfterSlide = true; // Initialize to true to allow running immediately
 
 // Listen for keydown events
 document.addEventListener('keydown', function (event) {
     switch (event.code) {
         case 'KeyW':
-            keyState.w = true;
+            if (!isSliding && wKeyReleasedAfterSlide) {
+                keyState.w = true;
+            }
             break;
         case 'KeyA':
             keyState.a = true;
@@ -55,6 +58,9 @@ document.addEventListener('keyup', function (event) {
     switch (event.code) {
         case 'KeyW':
             keyState.w = false;
+            if (isSliding) {
+                wKeyReleasedAfterSlide = true;
+            }
             break;
         case 'KeyA':
             keyState.a = false;
@@ -66,10 +72,10 @@ document.addEventListener('keyup', function (event) {
             keyState.d = false;
             break;
         case 'KeyQ':
-            keyState.q = true;
+            keyState.q = false;  // Note: Changed to false
             break;
         case 'KeyE':
-            keyState.e = true;
+            keyState.e = false;  // Note: Changed to false
             break;
     }
 });
@@ -100,6 +106,7 @@ function initControls() {
 let mouseIsDown = false;
 let isLeftButtonPressed = false;
 let isRightButtonPressed = false;
+
 
 // Initially set to false
 document.addEventListener('mousedown', () => {
@@ -211,7 +218,7 @@ document.addEventListener('wheel', function (event) {
 
 // Listen for mouse move
 document.addEventListener('mousemove', function (event) {
-    if (isRightButtonPressed) {
+    if (isRightButtonPressed && !isSliding) {  // Added !isSliding condition here
         // Update player direction here based on mouse movement
         // You can use event.movementX and event.movementY to get the mouse delta
         player.rotation.y -= event.movementX * 0.01;  // Adjust the multiplier as needed
@@ -236,20 +243,46 @@ const forwardSpeed = maxSpeed;  // Maximum speed when moving forward
 const backwardSpeed = maxSpeed * 0.4;  // Maximum speed when moving backward
 const lateralSpeed = maxSpeed * 0.6;  // Maximum speed when moving laterally
 
-
+let slidingDeceleration = 1
+const slidingSpeedBoost = 3; // Add this to your constants; adjust as needed
 let currentDirection = new THREE.Vector3();  // Current movement direction
 let desiredDirection = new THREE.Vector3();  // Desired movement direction based on key presses
 
+//Private bariablesw
+class Player {
+    constructor() {
+        this._isSliding = false; // private variable
+    }
+
+    get isSliding() {
+        return this._isSliding;
+    }
+
+    set isSliding(value) {
+        this._isSliding = value;
+    }
+}
+
+
 function updateControls() {
     if (player) {
-        // Reset desiredDirection
-        desiredDirection.set(0, 0, 0);
+        // If sliding, restrict movement to forward only
+        if (isSliding) {
+            desiredDirection.set(0, 0, 1);
+            currentSpeed -= slidingDeceleration;  // apply some deceleration during slide
+            if (currentSpeed < 0) currentSpeed = 0;
+        } else {
+            // Reset desiredDirection
+            desiredDirection.set(0, 0, 0);
 
-        // Determine the desired direction based on pressed keys
-        if (keyState.w) desiredDirection.z = 1;
-        if (keyState.s) desiredDirection.z = -1;
-        if (keyState.q) desiredDirection.x = 1;
-        if (keyState.e) desiredDirection.x = -1;
+            // Determine the desired direction based on pressed keys
+            if (keyState.w && wKeyReleasedAfterSlide) {
+                desiredDirection.z = 1;
+            }
+            if (keyState.s) desiredDirection.z = -1;
+            if (keyState.q) desiredDirection.x = 1;
+            if (keyState.e) desiredDirection.x = -1;
+        }
 
         desiredDirection.normalize();
 
@@ -317,5 +350,4 @@ function updateControls() {
         handleActions(keyState);
     }
 }
-
 export { initControls, updateControls };
