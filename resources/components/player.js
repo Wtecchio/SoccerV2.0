@@ -43,7 +43,7 @@ function initPlayer() {
                         [walkAction, idleAction, runAction, slideAction] = animationActions;
                         idleAction.play();
                         player.velocity = new THREE.Vector3(0, 0, 0);
-                        player.position.set(62, .4, -118.15);
+                        player.position.set(62, .3, -118.15);
                         player.scale.set(2, 2, 2);
                         resolve();
                     }
@@ -115,7 +115,7 @@ function initiateSliding() {
         isSliding = true;
     }
 
-    let targetY = originalY - 1.6;
+    let targetY = originalY - 1.65;
 
     // Disable state updates for the duration of the slide animation
     allowStateUpdate = false;
@@ -130,7 +130,7 @@ function initiateSliding() {
         const t = Math.min(elapsedTime / totalDurationMs, 1);
 
         // These thresholds determine when each phase of the piecewise function begins/ends
-        const threshold1 = 0.1;  // 10% of the total duration
+        const threshold1 = 0.165;  // 10% of the total duration
         const threshold2 = 0.6;  // 80% of the total duration
 
         if (t <= threshold1) {

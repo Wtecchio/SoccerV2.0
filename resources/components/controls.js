@@ -344,8 +344,12 @@ function updateControls() {
 
         // Update the camera position
         camera.position.set(x, y, z);
-        camera.lookAt(player.position);
 
+        // Adjust the camera's lookAt target with a y-offset for torso
+        const lookAtOffsetY = 1.5;  // adjust this value to your liking
+        const lookAtTarget = new THREE.Vector3(player.position.x, player.position.y + lookAtOffsetY, player.position.z);
+
+        camera.lookAt(lookAtTarget);
 
         handleActions(keyState);
     }
