@@ -42,12 +42,12 @@ async function createBall() {
 
 // Inside ball.js
 export function applySlideForce(player) {
-    // Assuming that player.velocity is a THREE.Vector3 representing the player's velocity at the time of the slide
-    const slideForce = player.velocity.clone().multiplyScalar(2);  // You can tweak this multiplier
+    console.log("Applying slide force");
+    console.log("Player velocity: ", player.velocity);
 
-    // Apply the slide force to the ball using the applyForce method you already have
+    // Your existing code
+    const slideForce = player.velocity.clone().multiplyScalar(2);
     ball.applyForce(slideForce);
 }
-
 
 export { createBall, ball };

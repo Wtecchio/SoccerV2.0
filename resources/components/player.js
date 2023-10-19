@@ -8,6 +8,13 @@ export let player;
 export let mixer;
 let idleAction, runAction, walkAction, slideAction;
 
+//FOR MESH DELETE LATER
+let collisionDebugMesh;  // Add this line at the top of your file
+const geometry = new THREE.SphereGeometry(1.3, 32, 32);  // Using a sphere with a radius of 1.3
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+
+
+
 // Initialize the player
 function initPlayer() {
     return new Promise((resolve, reject) => {
@@ -22,6 +29,10 @@ function initPlayer() {
             const scaleValue = 1;
             player.scale.set(scaleValue, scaleValue, scaleValue);
             scene.add(player);
+
+            //DEBUG MESH DELETE LATER PLEASE 
+            collisionDebugMesh = new THREE.Mesh(geometry, material);
+            scene.add(collisionDebugMesh);
 
             // Initialize the animation mixer
             mixer = new THREE.AnimationMixer(player);
@@ -62,13 +73,15 @@ let isSliding = false; // Add this flag outside the function to track the slidin
 let targetY; // Declare this at the top of your script where you declare other variables like isSliding
 
 
-let slidingStartTime = null;
-let originalY = null;
+
 
 function updatePlayer() {
     if (!allowStateUpdate) return;
 
     const currentState = getPlayerState();
+
+    //DEBUG FOR MESH PLEASE DELETE
+    //collisionDebugMesh.position.copy(player.position);
 
     if (currentState !== lastState) {
         // Stop all actions first
@@ -80,7 +93,7 @@ function updatePlayer() {
         // Reset timeScale for all actions
         idleAction.timeScale = 1;
         runAction.timeScale = 1.2;
-        walkAction.timeScale = -1;
+        walkAction.timeScale = -.8;
         slideAction.timeScale = 1;
 
         switch (currentState) {
@@ -135,6 +148,13 @@ function initiateSliding() {
         // Assuming your frame rate is around 60fps, then 120 frames would be about 2000ms.
         const totalDurationMs = 1850;
         const t = Math.min(elapsedTime / totalDurationMs, 1);
+
+        //DEBUG FOR MESH PLEASE DELETE
+        //collisionDebugMesh.position.copy(player.position);
+        //
+
+
+
 
         // These thresholds determine when each phase of the piecewise function begins/ends
         const threshold1 = 0.16;  // 10% of the total duration
