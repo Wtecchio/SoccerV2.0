@@ -92,7 +92,7 @@ function updatePlayer() {
 
         // Reset timeScale for all actions
         idleAction.timeScale = 1;
-        runAction.timeScale = 1.2;
+        runAction.timeScale = 1;
         walkAction.timeScale = -.8;
         slideAction.timeScale = 1;
 
