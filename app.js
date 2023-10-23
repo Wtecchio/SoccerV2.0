@@ -4,7 +4,10 @@ import { createField } from './resources/components/field.js';
 import { createBall } from './resources/components/ball.js';
 import { initPhysics, updatePhysics } from './resources/components/physics.js';
 import { initControls, updateControls } from './resources/components/controls.js';
-//import { initPlayer, updatePlayer } from './resources/components/player.js';
+import { initPlayer, updatePlayer, mixer } from './resources/components/player.js';
+import { applyMagneticEffect } from './resources/components/magnet.js';
+import { updatePlayerState } from './resources/components/playerState.js';
+import { initVectors, updateVectors } from './resources/components/debugVectors.js';  // Adjust path as needed
 //import { initScore, updateScore } from './resources/components/score.js';
 //import { animate } from './resources/components/animations.js';
 
@@ -14,25 +17,38 @@ import { initControls, updateControls } from './resources/components/controls.js
 
 
     // Initialization
+
     initScene();
 
     // Load assets MIGHT NOT NEED FOR NOW
     await loadAssets();
 
+
     // Create field
     createField();
 
     // Create ball
-    createBall();
+    await createBall();
+
+
 
     // Initialize physics
-    initPhysics();
+    await initPhysics();
+
+    //Initialize player
+    await initPlayer();
+
+
+    //DEBUG PHYSICS VECTORS
+    initVectors();
+
+    if (mixer) {
+        console.log("Available actions in mixer:", mixer._actions);
+    }
 
     // Initialize controls
     //initControls();
 
-    //Initialize player
-    //initPlayer();
 
     // Initialize scoring system
     //initScore();
@@ -41,6 +57,7 @@ import { initControls, updateControls } from './resources/components/controls.js
 
 
     let previousTime = performance.now();
+
     // Main game loop
     function gameLoop(currentTime) {
 
@@ -49,15 +66,30 @@ import { initControls, updateControls } from './resources/components/controls.js
         const deltaTime = (currentTime - previousTime) / 1000;
         previousTime = currentTime;
 
-
         // Update controls
-       updateControls();
+        updateControls();
+
+        // Update player state based on current conditions
+        updatePlayerState();  
+
+        // Update player
+        updatePlayer(deltaTime);
+
 
         // Update physics
         updatePhysics(deltaTime);
 
-        // Update player
-        //updatePlayer();
+        // Apply the magnetic effect between player and ball
+        applyMagneticEffect();
+
+
+
+        //for debugging vector forces debug when done
+        updateVectors();
+
+        if (mixer) {  // Check if mixer exists
+            mixer.update(deltaTime);
+        }
 
         // Update scoring system
        // updateScore();
